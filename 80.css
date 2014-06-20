@@ -1,0 +1,16 @@
+@font-face {
+	font-family: 'hel';
+	src:url('hel.otf');
+}
+.bar {
+	background-color: #009900;
+	width: 4em;
+	transition-property: color, width;
+	-webkit-transition-property: color, width;
+	transition-duration: 1s;
+	transition-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1.0);
+}
+.percent{
+	font-size: 5em:
+	font-family: hel;
+}
