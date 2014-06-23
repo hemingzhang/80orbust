@@ -2,15 +2,35 @@
 	font-family: 'hel';
 	src:url('hel.otf');
 }
+@font-face {
+	font-family: 'hello';
+	src: url('hello.ttf');
+}
+body {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .bar {
 	background-color: #009900;
-	width: 4em;
 	transition-property: color, width;
 	-webkit-transition-property: color, width;
 	transition-duration: 1s;
 	transition-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1.0);
 }
+
 .percent{
-	font-size: 5em:
+	font-size: 2em;
 	font-family: hel;
+}
+
+.label {
+	font-size: 1em;
+	color: #666666;
+	font-family: hello;
+}
+
+.lineLabel {
+	font-family: hello;
 }
