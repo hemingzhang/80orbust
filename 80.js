@@ -32,6 +32,15 @@ function graph(containingElement, grades, barHeight, barWidth){
 
 	this.containingElement.appendChild(this.element);
 
+	this.thresholdContainer = document.createElement('div');
+	this.thresholdContainer.style.position = "absolute";
+	this.thresholdContainer.style.width = this.element.clientWidth + "px";
+	this.thresholdContainer.style.height = this.barHeight + "px";
+	this.thresholdContainer.style.left = 0;
+	this.thresholdContainer.style.zIndex = "-10";
+
+	this.thresholds = new Array();
+
 }
 
 function threshold(barHeight, width, label, color, value, overhang, containingElement){
@@ -65,14 +74,6 @@ function threshold(barHeight, width, label, color, value, overhang, containingEl
 }
 
 graph.prototype.addThresholds = function(thresholdArray, overhang){
-	this.thresholdContainer = document.createElement('div');
-	this.thresholdContainer.style.position = "absolute";
-	this.thresholdContainer.style.width = this.element.clientWidth + "px";
-	this.thresholdContainer.style.height = this.barHeight + "px";
-	this.thresholdContainer.style.left = 0;
-	this.thresholdContainer.style.zIndex = "-10";
-
-	this.thresholds = new Array();
 
 	for (i in thresholdArray) {
 		// var element = document.createElement("div");
@@ -103,6 +104,7 @@ function graphBar(grade, height, width, label) {
 	this.labelElement.className = "label";
 
 	this.barElement.style.width = width + "px";
+	this.barElement.style.position = "relative";
 
 	this.element = document.createElement('span');
 	this.element.style.margin = "0 1em";
@@ -124,6 +126,7 @@ function graphBar(grade, height, width, label) {
 graphBar.prototype.setGrade = function(grade) {
 	this.grade = grade;
 	this.barElement.style.height = (this.maxBarHeight * grade).toString() + "px";
+	this.barElement.style.marginTop = (this.maxBarHeight * (1 - grade)).toString() + "px";
 	var newGrade = (this.grade * 100).toFixed(2);
 	if (newGrade == "100.00") newGrade = "100";
 	this.percentElement.innerText = newGrade + "%";
