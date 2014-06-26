@@ -5,7 +5,11 @@
 		<script type="text/javascript">
 			window.onload = function(){
 				lol = document.querySelector("#lol");
-				g = new graph(lol, [{value:0.0123, label: "fuck"}, {value:0.3, label: "goddamn"}, {value:0.9, label:"I hate life"}, {value: 0.8, label:"girls are great"}], 500, 75, [{label: "lmao", value: 0.6, color: "#aa0000"}]);
+				g = new graph(lol, [{value:0.0123, label: "Spirited Teamwork"},
+						{value:0.342, label: "Courage to Innovate"},
+						{value:0.784, label:"Passion for Growth"},
+						{value: 0.811, label:"Initiating Opportunity"}],
+						600, 75, "KPI Average");
 				r = g.graphBars[0];
 				var decileThresholds = [{label: "0", color:"#666666", value: 0},
 					{label: "10", color:"#666666", value: 0.1},
@@ -22,8 +26,10 @@
 					{label: "Bad", color: "#990000", value: 0.65},
 					{label: "Acceptable", color: "#999900", value: 0.75},
 					{label: "Good", color: "#009900", value: 0.85}];
-				g.addThresholds(decileThresholds, 20);
-				g.addThresholds(lmaos, 100);
+				waitForWebfonts(["hel", "hello"], function(){
+					g.addThresholds(decileThresholds, 20);
+					g.addThresholds(lmaos, 100);
+				});
 			}
 		</script>
 	</head>
