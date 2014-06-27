@@ -114,7 +114,7 @@ function graphBar(grade, height, width, label) {
 	// this.barElement.style.height = (this.maxBarHeight * grade).toString() + "px";
 	// this.percentElement.innerText = (this.grade * 100).toFixed(2).toString() + "%";
 
-	this.setGrade(this.grade);
+	this.setGrade(0);
 
 	this.labelElement.innerText = this.label;
 	this.element.appendChild(this.barElement);
@@ -122,6 +122,7 @@ function graphBar(grade, height, width, label) {
 	this.element.appendChild(document.createElement('br'));
 	this.element.appendChild(this.labelElement);
 	this.duration = 1000;
+	this.tweenGrade(grade);
 }
 
 graphBar.prototype.setGrade = function(grade) {
@@ -133,47 +134,32 @@ graphBar.prototype.setGrade = function(grade) {
 	this.percentElement.innerText = newGrade + "%";
 }
 
-function getStepFrames(oldGrade, newGrade, duration) {
+function getStepFrames(oldGrade, newGrade, frames) {
 	// for now
-	return [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,newGrade];
+	// return [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,newGrade];
+	var d = awfulBezierApproximation(0.3, 0.4, 0.5, 1, Math.floor(frames * 1.5));
+	var f = normalizePoints(d, frames);
+	var r = [];
+	var delta = newGrade - oldGrade;
+	for(var i = 0; i < f.length; ++i) r[i] = (f[i][1]) * delta + oldGrade;
+	return r;
 }
 
 graphBar.prototype.tweenGrade = function(grade) {
 	var oldGrade = this.grade;
 	var newGrade = grade;
-	var frames = getStepFrames(oldGrade, newGrade, this.duration);
+	var frames = getStepFrames(oldGrade, newGrade, this.duration * 0.06);
+	// console.log(frames);
 	var f = (function(){
 		if(frames.length > 0) {
-			var i = frames.splice(0,1);
+			var i = frames.splice(0,1)[0];
+			// console.log(this.grade);
+			// console.log(i);
 			this.setGrade(i);
 			requestAnimationFrame(f);
 		}
 	}).bind(this);
 	f();
-}
-
-function deCasteljau(controlPoints, t){
-	// controlPoints is in the format [[x0, y0], [x1, y1], .. ,[xn, yn]], 0 <= t <=1
-
-	if (controlPoints.length == 1) return controlPoints[0];
-
-	if (controlPoints.length <= 0) {
-		console.log("what the fuck");
-		return;
-	}
-
-	var order = controlPoints.length - 1;
-	var derivedPoints = [];
-	for (var i = 0; i < order; ++i) {
-		derivedPoints[i] = linearInterpolate(controlPoints[i][0],
-			controlPoints[i+1][0], controlPoints[i][1],
-			controlPoints[i+1][1], t);
-	}
-	return deCasteljau(derivedPoints, t);
-}
-
-function linearInterpolate(x1,x2,y1,y2,t) {
-	return [(1-t)*x1 + t*x2, (1-t)*y1 + t*y2];
 }
 
 function waitForWebfonts(fonts, callback) {
