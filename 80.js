@@ -1,5 +1,5 @@
 // 80orbust.js
-// a grade is {value: 0.6, label: "Assignment 1"}
+// a grade is {value: 0.6, label: "Assignment 1", weight: 1}
 // a threshold is {label: "OK", value:0.6, color:"#009900"}
 
 
@@ -43,17 +43,21 @@ function graph(containingElement, grades, barHeight, barWidth, averageLabel){
 	this.barWidth = barWidth;
 
 	var average = 0;
+	var totalWeight = 0;
 
-	for (i in grades) average += grades[i]["value"];
+	for (i in grades){
+		average += (grades[i]["value"] * grades[i]["weight"]);
+		totalWeight += grades[i]["weight"];
+	}
 
-	average = average / grades.length;
+	average = average / totalWeight;
 
-	this.averageBar = new graphBar(average, this.barHeight, this.barWidth * 1.5, averageLabel);
+	this.averageBar = new graphBar(average, this.barHeight, this.barWidth * 1.5, averageLabel, 0);
 	this.averageBar.element.style.margin = "0 2em 0 1em";
 	this.element.appendChild(this.averageBar.element);
 	this.graphBars = [];
 	for (var i = 0; i < grades.length; ++i) {
-		var gB = new graphBar(grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"]);
+		var gB = new graphBar(grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"]);
 		this.element.appendChild(gB.element);
 		this.graphBars.push(gB);
 	}
@@ -111,9 +115,10 @@ graphDisplay.prototype.addThresholds = function(thresholdArray, overhang){
 	this.graph.element.appendChild(this.thresholdContainer);
 }
 
-function graphBar(grade, height, width, label) {
+function graphBar(grade, height, width, label, weight) {
 	this.grade = grade;
 	this.label = label;
+	this.weight = weight;
 
 	this.barElement = document.createElement('div');
 	this.percentElement = document.createElement('span');

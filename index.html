@@ -6,10 +6,10 @@
 		<script type="text/javascript">
 			window.onload = function(){
 				lol = document.querySelector("#lol");
-				g = new graphDisplay("Key Performance Indicators", lol, [[{value:0.0123, label: "Spirited Teamwork"},
-						{value:0.342, label: "Courage to Innovate"},
-						{value:0.784, label:"Passion for Growth"},
-						{value: 0.811, label:"Initiating Opportunity"}],
+				g = new graphDisplay("Key Performance Indicators", lol, [[{value:0.0123, label: "Spirited Teamwork", weight: 1},
+						{value:0.342, label: "Courage to Innovate", weight: 1},
+						{value:0.784, label:"Passion for Growth", weight: 1},
+						{value: 0.811, label:"Initiating Opportunity", weight: 99}],
 						500, 75, "KPI Average"]);
 				r = g.graph.graphBars[0];
 				var decileThresholds = [{label: "0", color:"#666666", value: 0},
