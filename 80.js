@@ -3,6 +3,34 @@
 // a threshold is {label: "OK", value:0.6, color:"#009900"}
 
 
+function graphDisplay(header, containingElement, gA) {
+	console.log(gA);
+	this.element = document.createElement('div');
+
+	this.header = header;
+	this.headerElement = document.createElement('span');
+	this.headerElement.textContent = header;
+	this.headerElement.className = "graphHeader";
+	this.headerElement.style.marginBottom = "2em";
+	this.element.appendChild(this.headerElement);
+
+	this.graph = new graph(this.element, gA[0], gA[1], gA[2], gA[3]);
+
+	containingElement.appendChild(this.element);
+
+	this.thresholdContainer = document.createElement('div');
+	this.thresholdContainer.style.position = "absolute";
+	this.thresholdContainer.style.width = this.graph.element.clientWidth + "px";
+	console.log(this.graph.element.clientWidth);
+	this.thresholdContainer.style.height = this.graph.barHeight + "px";
+	console.log(this.graph.barHeight);
+	this.thresholdContainer.style.left = 0;
+	this.thresholdContainer.style.zIndex = "-10";
+
+	this.thresholds = new Array();
+
+}
+
 function graph(containingElement, grades, barHeight, barWidth, averageLabel){
 	this.containingElement = containingElement;
 	this.element = document.createElement('div');
@@ -32,15 +60,6 @@ function graph(containingElement, grades, barHeight, barWidth, averageLabel){
 
 	this.containingElement.appendChild(this.element);
 
-	this.thresholdContainer = document.createElement('div');
-	this.thresholdContainer.style.position = "absolute";
-	this.thresholdContainer.style.width = this.element.clientWidth + "px";
-	console.log(this.element.clientWidth);
-	this.thresholdContainer.style.height = this.barHeight + "px";
-	this.thresholdContainer.style.left = 0;
-	this.thresholdContainer.style.zIndex = "-10";
-
-	this.thresholds = new Array();
 
 }
 
@@ -74,7 +93,7 @@ function threshold(barHeight, width, label, color, value, overhang, containingEl
 
 }
 
-graph.prototype.addThresholds = function(thresholdArray, overhang){
+graphDisplay.prototype.addThresholds = function(thresholdArray, overhang){
 
 	for (i in thresholdArray) {
 		// var element = document.createElement("div");
@@ -86,10 +105,10 @@ graph.prototype.addThresholds = function(thresholdArray, overhang){
 		// element.style.backgroundColor = thresholdArray[i]["color"];
 		// this.thresholdElements[i] = element;
 		// this.thresholdContainer.appendChild(element);
-		this.thresholds.push(new threshold(this.barHeight, this.element.clientWidth + overhang, thresholdArray[i]["label"], thresholdArray[i]["color"], thresholdArray[i]["value"], overhang, this.thresholdContainer));
+		this.thresholds.push(new threshold(this.graph.barHeight, this.graph.element.clientWidth + overhang, thresholdArray[i]["label"], thresholdArray[i]["color"], thresholdArray[i]["value"], overhang, this.thresholdContainer));
 	}
 
-	this.element.appendChild(this.thresholdContainer);
+	this.graph.element.appendChild(this.thresholdContainer);
 }
 
 function graphBar(grade, height, width, label) {
@@ -121,7 +140,7 @@ function graphBar(grade, height, width, label) {
 	this.element.appendChild(this.percentElement);
 	this.element.appendChild(document.createElement('br'));
 	this.element.appendChild(this.labelElement);
-	this.duration = 1000;
+	this.duration = 1500;
 	this.tweenGrade(grade);
 }
 

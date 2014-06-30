@@ -34,3 +34,8 @@ body {
 .lineLabel {
 	font-family: hello;
 }
+
+.graphHeader {
+	font-size: 5em;
+	font-family: 'hel';
+}
