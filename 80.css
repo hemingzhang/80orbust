@@ -14,18 +14,22 @@ body {
 
 .bar {
 	background-color: #009900;
-	transition-property: color, width;
-	-webkit-transition-property: color, width;
+	transition-property: color, width, opacity;
+	-webkit-transition-property: color, width, opacity;
 	transition-duration: 1s;
 	transition-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1.0);
 }
 
 .percent{
+	transition-property: opacity;
+	-webkit-transition-property: opacity;
 	font-size: 2em;
 	font-family: hel;
 }
 
 .label {
+	transition-property: opacity;
+	-webkit-transition-property: opacity;
 	font-size: 1em;
 	color: #666666;
 	font-family: hello;
@@ -38,4 +42,8 @@ body {
 .graphHeader {
 	font-size: 5em;
 	font-family: 'hel';
+}
+
+.fadeOut {
+	opacity: 0;
 }
