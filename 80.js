@@ -61,6 +61,8 @@ function graph(containingElement, grades, barHeight, barWidth, averageLabel, add
 
 	this.addBars(addBarMode, grades, barHeight, barWidth, averageLabel);
 
+	this.transitionCount = 0;
+
 	this.containingElement.appendChild(this.element);
 }
 
@@ -77,29 +79,33 @@ graph.prototype.addBars = function(mode, grades, barHeight, barWidth, averageLab
 
 	switch(mode) {
 		case "noAverageTransition":
-			this.averageBar = new graphBar(average, average, this.barHeight, this.barWidth * 1.5, averageLabel, 0);
+			this.averageBar = new graphBar(average, average, this.barHeight, this.barWidth * 1.5, averageLabel, 0, this);
 			this.averageBar.element.style.margin = "0 2em 0 1em";
 			this.element.appendChild(this.averageBar.element);
 			this.graphBars = [];
 			for (var i = 0; i < grades.length; ++i) {
-				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"]);
+				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this);
 				this.element.appendChild(gB.element);
 				this.graphBars.push(gB);
 			}
 			break;
 
 		default:
-			this.averageBar = new graphBar(0, average, this.barHeight, this.barWidth * 1.5, averageLabel, 0);
+			this.averageBar = new graphBar(0, average, this.barHeight, this.barWidth * 1.5, averageLabel, 0, this);
 			this.averageBar.element.style.margin = "0 2em 0 1em";
 			this.element.appendChild(this.averageBar.element);
 			this.graphBars = [];
 			for (var i = 0; i < grades.length; ++i) {
-				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"]);
+				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this);
 				this.element.appendChild(gB.element);
 				this.graphBars.push(gB);
 			}
 			break;
 	}
+}
+
+graph.prototype.reportTransitionFinish = function() {
+	this.transitionCount += 1;
 }
 
 function threshold(barHeight, width, label, color, value, overhang, containingElement){
@@ -132,10 +138,11 @@ function threshold(barHeight, width, label, color, value, overhang, containingEl
 
 }
 
-function graphBar(initialGrade, grade, height, width, label, weight) {
+function graphBar(initialGrade, grade, height, width, label, weight, graph) {
 	this.grade = grade;
 	this.label = label;
 	this.weight = weight;
+	this.graph = graph;
 
 	this.barElement = document.createElement('div');
 	this.percentElement = document.createElement('span');
