@@ -1,16 +1,16 @@
 // 80orbust.js
-// a grade is {value: 0.6, label: "Assignment 1", weight: 1}
+// a grade is {value: 0.6, label: "Assignment 1", weight: 1, id: 0, subgrades:{value: 0.5, label: "Question 1", weight: 1, id: 0}}
 // a threshold is {label: "OK", value:0.6, color:"#009900"}
 
 function graphDisplay(header, containingElement, gA) {
 	console.log(gA);
 	this.element = document.createElement('div');
+	this.element.style.display = 'relative';
 
 	this.header = header;
 	this.headerElement = document.createElement('span');
 	this.headerElement.textContent = header;
 	this.headerElement.className = "graphHeader";
-	this.headerElement.style.marginBottom = "2em";
 	this.element.appendChild(this.headerElement);
 
 	this.graph = new graph(this.element, gA[0], gA[1], gA[2], gA[3], gA[4]);
@@ -55,13 +55,17 @@ function graph(containingElement, grades, barHeight, barWidth, averageLabel, add
 	this.element.style.position = "relative";
 	this.element.style.alignItems = "flex-end";
 	this.element.style.justifyContent = "center";
+	this.grades = grades;
 
 	this.barHeight = barHeight;
 	this.barWidth = barWidth;
 
+	this.graphBars = {};
 	this.addBars(addBarMode, grades, barHeight, barWidth, averageLabel);
 
 	this.transitionCount = 0;
+
+	this.subgraphs = {};
 
 	this.containingElement.appendChild(this.element);
 }
@@ -82,11 +86,10 @@ graph.prototype.addBars = function(mode, grades, barHeight, barWidth, averageLab
 			this.averageBar = new graphBar(average, average, this.barHeight, this.barWidth * 1.5, averageLabel, 0, this);
 			this.averageBar.element.style.margin = "0 2em 0 1em";
 			this.element.appendChild(this.averageBar.element);
-			this.graphBars = [];
 			for (var i = 0; i < grades.length; ++i) {
-				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this);
+				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this, grades[i]['id']);
 				this.element.appendChild(gB.element);
-				this.graphBars.push(gB);
+				this.graphBars[grades[i]["id"]] = gB;
 			}
 			break;
 
@@ -94,11 +97,10 @@ graph.prototype.addBars = function(mode, grades, barHeight, barWidth, averageLab
 			this.averageBar = new graphBar(0, average, this.barHeight, this.barWidth * 1.5, averageLabel, 0, this);
 			this.averageBar.element.style.margin = "0 2em 0 1em";
 			this.element.appendChild(this.averageBar.element);
-			this.graphBars = [];
 			for (var i = 0; i < grades.length; ++i) {
-				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this);
+				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this, grades[i]['id']);
 				this.element.appendChild(gB.element);
-				this.graphBars.push(gB);
+				this.graphBars[grades[i]["id"]] = gB;
 			}
 			break;
 	}
@@ -106,6 +108,36 @@ graph.prototype.addBars = function(mode, grades, barHeight, barWidth, averageLab
 
 graph.prototype.reportTransitionFinish = function() {
 	this.transitionCount += 1;
+	console.log(this.transitionCount);
+	console.log(this.numOfTransitions);
+	if (this.transitionCount == this.numOfTransitions) this.finishTransitionOut();
+}
+
+graph.prototype.initiateTransitionOut = function(barId){
+	this.numOfTransitions = Object.keys(this.graphBars).length + 1;
+	this.transitionCount = 0;
+	this.currentTransitionBarId = barId;
+	//determine how far to move the new averageBar
+	var xDelta = this.averageBar.element.offsetLeft - this.graphBars[barId].element.offsetLeft;
+
+	for(i in this.graphBars) {
+		if(i != barId) this.graphBars[i].fadeOut();
+	}
+	this.averageBar.fadeOut();
+
+	this.graphBars[barId].moveHorizontal(xDelta, this.barWidth * 1.5);
+
+}
+
+graph.prototype.finishTransitionOut = function() {
+	console.log(';e;');
+	if (this.subgraphs[this.currentTransitionBarId] == undefined){
+		console.log(this.grades[this.currentTransitionBarId]['subgrades']);
+		this.subgraphs[this.currentTransitionBarId] = new graph(this.containingElement, this.grades[this.currentTransitionBarId]['subgrades'],this.barHeight, this.barWidth, this.averageLabel);
+	}
+	else this.subgraphs[this.currentTransitionBarId].element.style.display = "relative";
+	this.currentTransitionBarId = undefined;
+	this.element.style.display = 'none';
 }
 
 function threshold(barHeight, width, label, color, value, overhang, containingElement){
@@ -138,11 +170,12 @@ function threshold(barHeight, width, label, color, value, overhang, containingEl
 
 }
 
-function graphBar(initialGrade, grade, height, width, label, weight, graph) {
+function graphBar(initialGrade, grade, height, width, label, weight, graph, id) {
 	this.grade = grade;
 	this.label = label;
 	this.weight = weight;
 	this.graph = graph;
+	this.id = id;
 
 	this.barElement = document.createElement('div');
 	this.percentElement = document.createElement('span');
@@ -156,6 +189,7 @@ function graphBar(initialGrade, grade, height, width, label, weight, graph) {
 	this.barElement.style.position = "relative";
 
 	this.element = document.createElement('span');
+	this.element.className = "graphBar";
 	this.element.style.margin = "0 1em";
 	// this.element.style.display="inline";
 	this.maxBarHeight = height;
@@ -167,10 +201,16 @@ function graphBar(initialGrade, grade, height, width, label, weight, graph) {
 			case 'transitionend':
 				this.element.removeEventListener('transitionend', this, false);
 				this.element.removeEventListener('webkitTransitionEnd', this, false);
+				this.graph.reportTransitionFinish();
 				break;
 			case 'webkitTransitionEnd':
 				this.element.removeEventListener('transitionend', this, false);
 				this.element.removeEventListener('webkitTransitionEnd', this, false);
+				this.graph.reportTransitionFinish();
+				break;
+			case 'click':
+				this.element.removeEventListener('click', this, false);
+				this.graph.initiateTransitionOut(this.id);
 				break;
 		}
 	}
@@ -182,6 +222,11 @@ function graphBar(initialGrade, grade, height, width, label, weight, graph) {
 	this.element.appendChild(this.percentElement);
 	this.element.appendChild(document.createElement('br'));
 	this.element.appendChild(this.labelElement);
+
+	this.element.style.left = '0';
+
+	this.element.addEventListener('click', this, false);
+
 	this.duration = 1500;
 	this.tweenGrade(grade);
 }
@@ -213,7 +258,16 @@ graphBar.prototype.tweenGrade = function(grade) {
 }
 
 graphBar.prototype.fadeOut = function(){
-	this.element.className = "fadeOut";
+	this.element.style.opacity = '0';
+	this.element.addEventListener("transitionend", this, false);
+	this.element.addEventListener("webkitTransitionEnd", this, false);
+}
+
+graphBar.prototype.moveHorizontal = function(px, barWidth) {
+	console.log(px);
+	this.element.style.position = 'relative';
+	this.element.style.left = px + "px";
+	this.barElement.style.width = barWidth + "px";
 	this.element.addEventListener("transitionend", this, false);
 	this.element.addEventListener("webkitTransitionEnd", this, false);
 }
