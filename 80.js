@@ -1,5 +1,7 @@
 // 80orbust.js
-// a grade is {value: 0.6, label: "Assignment 1", weight: 1, id: 0, subgrades:{value: 0.5, label: "Question 1", weight: 1, id: 0}}
+// a grade is {0:{value: 0.6, label: "Assignment 1", weight: 1, 
+// 		subgrades:{value: 0.5, label: "Question 1", weight: 1, id: 0}},
+// 				1:{value: 0.8, label: "Assignment 2", weight: 2}}
 // a threshold is {label: "OK", value:0.6, color:"#009900"}
 
 function graphDisplay(header, containingElement, gA) {
@@ -12,6 +14,8 @@ function graphDisplay(header, containingElement, gA) {
 	this.headerElement.textContent = header;
 	this.headerElement.className = "graphHeader";
 	this.element.appendChild(this.headerElement);
+
+	this.thresholds = {}
 
 	this.graph = new graph(this.element, gA[0], gA[1], gA[2], gA[3], gA[4]);
 
@@ -30,9 +34,13 @@ function graphDisplay(header, containingElement, gA) {
 
 }
 
-graphDisplay.prototype.addThresholds = function(thresholdArray, overhang){
+graphDisplay.prototype.newThresholds = function(name, thresholdArray, overhang){
+	this.thresholds[name] = {array: thresholdArray, 'overhang': overhang};
+}
 
-	for (i in thresholdArray) {
+graphDisplay.prototype.addThresholds = function(name){
+
+	for (var i in this.thresholds[name]['array']) {
 		// var element = document.createElement("div");
 		// element.style.position = "absolute";
 		// element.style.height = "1px";
@@ -42,7 +50,7 @@ graphDisplay.prototype.addThresholds = function(thresholdArray, overhang){
 		// element.style.backgroundColor = thresholdArray[i]["color"];
 		// this.thresholdElements[i] = element;
 		// this.thresholdContainer.appendChild(element);
-		this.thresholds.push(new threshold(this.graph.barHeight, this.graph.element.clientWidth + overhang, thresholdArray[i]["label"], thresholdArray[i]["color"], thresholdArray[i]["value"], overhang, this.thresholdContainer));
+		this.thresholds.push(new threshold(this.graph.barHeight, this.graph.element.clientWidth + this.thresholds[name]['overhang'], this.thresholds[name]['array'][i]["label"], this.thresholds[name]['array'][i]["color"], this.thresholds[name]['array'][i]["value"], this.thresholds[name]['overhang'], this.thresholdContainer));
 	}
 
 	this.graph.element.appendChild(this.thresholdContainer);
@@ -86,10 +94,11 @@ graph.prototype.addBars = function(mode, grades, barHeight, barWidth, averageLab
 			this.averageBar = new graphBar(average, average, this.barHeight, this.barWidth * 1.5, averageLabel, 0, this);
 			this.averageBar.element.style.margin = "0 2em 0 1em";
 			this.element.appendChild(this.averageBar.element);
-			for (var i = 0; i < grades.length; ++i) {
-				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this, grades[i]['id']);
+			// for (var i = 0; i < grades.length; ++i) {
+			for (var i in grades){
+				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this, i);
 				this.element.appendChild(gB.element);
-				this.graphBars[grades[i]["id"]] = gB;
+				this.graphBars[i] = gB;
 			}
 			break;
 
@@ -97,10 +106,11 @@ graph.prototype.addBars = function(mode, grades, barHeight, barWidth, averageLab
 			this.averageBar = new graphBar(0, average, this.barHeight, this.barWidth * 1.5, averageLabel, 0, this);
 			this.averageBar.element.style.margin = "0 2em 0 1em";
 			this.element.appendChild(this.averageBar.element);
-			for (var i = 0; i < grades.length; ++i) {
-				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this, grades[i]['id']);
+			// for (var i = 0; i < grades.length; ++i) {
+			for (var i in grades) {
+				var gB = new graphBar(0, grades[i]["value"], this.barHeight, this.barWidth, grades[i]["label"], grades[i]["weight"], this, i);
 				this.element.appendChild(gB.element);
-				this.graphBars[grades[i]["id"]] = gB;
+				this.graphBars[i] = gB;
 			}
 			break;
 	}

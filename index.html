@@ -6,12 +6,18 @@
 		<script type="text/javascript">
 			window.onload = function(){
 				lol = document.querySelector("#lol");
-				g = new graphDisplay("KPIs", lol, [[{value:0.0123, label: "Spirited Teamwork", weight: 1, id:3, subgrades: [{value:0.41, label:"l", weight:1, id:0},
-					{value:1, label:"34", weight:1, id:23}]},
-						{value:0.342, label: "Courage to Innovate", weight: 1, id:0},
-						{value:0.784, label:"Passion for Growth", weight: 1, id:1},
-						{value: 0.811, label:"Initiating Opportunity", weight: 99, id:2}],
-						500, 75, "KPI Average", "noAverageTransition"]);
+				grades = {
+					0: {value:0.0123, label: "Spirited Teamwork", weight: 1, subgrades: 
+						{
+							0: {value:0.41, label:"l", weight:1},
+							1: {value:1, label:"34", weight:1}
+						}
+					},
+					1: {value:0.342, label: "Courage to Innovate", weight: 1},
+					2: {value:0.784, label:"Passion for Growth", weight: 1},
+					3: {value: 0.811, label:"Initiating Opportunity", weight: 99}
+				};
+				g = new graphDisplay("KPIs", lol, [grades,500, 75, "KPI Average", "noAverageTransition"]);
 				r = g.graph.graphBars[0];
 				var decileThresholds = [{label: "0", color:"#666666", value: 0},
 					{label: "10", color:"#666666", value: 0.1},
@@ -29,8 +35,10 @@
 					{label: "Acceptable", color: "#999900", value: 0.75},
 					{label: "Good", color: "#009900", value: 0.85}];
 				waitForWebfonts(["hel", "hello"], function(){
-					g.addThresholds(decileThresholds, 20);
-					g.addThresholds(lmaos, 100);
+					g.newThresholds("d", decileThresholds, 20);
+					g.newThresholds("l", lmaos, 100);
+					g.addThresholds("d");
+					g.addThresholds("l");
 				});
 			}
 		</script>
