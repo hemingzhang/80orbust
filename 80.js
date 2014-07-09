@@ -269,6 +269,7 @@ graphBar.prototype.tweenGrade = function(grade) {
 
 graphBar.prototype.fadeOut = function(){
 	this.element.style.opacity = '0';
+	// this.element.style.position = 'absolute';
 	this.element.addEventListener("transitionend", this, false);
 	this.element.addEventListener("webkitTransitionEnd", this, false);
 }
